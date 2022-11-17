@@ -1,8 +1,9 @@
-import requests
+# pobranie działek w gml z podanego bboxa w usłudze wfs
+ 
+import requests, re
+from bs4 import BeautifulSoup
 
-# pobranie działek w gml z podanego bboxa w usłudze wfs :
-
-def wfs(url, service, request, version, typenames, bbox, srsname):
+def get_wfs(url, service, request, version, typenames, bbox, srsname):
     
     query = f"{url}?SERVICE={service}&REQUEST={request}&version={version}&TYPENAMES={typenames}&bbox={bbox}&SRSNAME={srsname}"
 
@@ -14,41 +15,23 @@ def wfs(url, service, request, version, typenames, bbox, srsname):
     else:
         print(f" adres {response} zwrócił kod {response.status_code}")
 
-
-# pobranie działek z uldk, na podst. teytów w pliku csv:
-
-def uldk(csv, metoda, format, output):
-    with open(csv) as f:
-        for line in f:
-            teryt=line.strip()
-            querry= f"https://uldk.gugik.gov.pl/?request=GetParcelById&id={teryt}&result={format}"
-            response = requests.get(querry)
-            pobrana_geom = str(response.content)[5:-3]
-            with open(f"{output}", "a",encoding = 'utf-8') as f:
-                f.write(pobrana_geom+"\n")
-            print(pobrana_geom)
-
-
-# parametry niezbędne dla funkcji wfs i jej wywołanie:
-
-url = 'https://geoportal.powiat.kielce.pl/map/geoportal/wfs.php' 
-service = 'WFS'
-request = 'GetFeature'
-version = '2.0.0'
-typenames = 'ewns:dzialki'
-bbox = '324922,607897,326156,611727'
-srsname = 'EPSG:2180'
-
-wfs(url, service, request, version, typenames, bbox, srsname)
-
-
-# parametry niezbędne do funkcji uldk i jej wywołanie:
-
-csv = 'dzialki.csv'
-metoda = 'GetParcelById'
-#metoda = 'GetAggregateArea'
-format = 'geom_wkt'
-# format = 'geom_extend'
-output = 'output.txt'
-
-uldk(csv, metoda, format, output)
+def gml_to_wkt(gml_file):
+    with open(gml_file, 'r') as f:
+        file = f.read() 
+        soup = BeautifulSoup(file,'xml')
+        geometrie = soup.find_all('gml:posList')
+        xy=[]
+        for geom in geometrie:
+            coord=re.findall("\d+\.\d+",geom.text)
+            xs = coord[0::2]
+            ys = coord[1::2]
+            coord2 = []
+            geom2 = ''
+            for x in xs:
+                point = f"{ys[xs.index(x)]} {x}"
+                geom2 += point
+            wkt = f"POLYGON(('{geom2}'))"
+            print(wkt)
+            with open(f"{gml_file}.wkt", "a",encoding = 'utf-8') as f:
+                                f.write(wkt+"\n")
+                       
