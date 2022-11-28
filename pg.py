@@ -4,10 +4,12 @@ class Uldk():
 
     def __init__(self, csv):
         self.csv = csv
-    
-    # stworzenie słownika {"TERYT":"GEOM_WKT"}
 
-    def json_teryt_geom(self):
+    ###################################################
+    # CSV (lista TERYTÓW) => JSON {"TERYT":"GEOM_WKT"}
+    ###################################################
+
+    def json(self):
         # narazie pusty słownik {"TERYT":"GEOM_WKT"}
         teryt_geom = {}
         # otwieramy csv z terytami
@@ -39,17 +41,76 @@ class Uldk():
         # zapis słownika {"TERYT":"GEOM_WKT"} do pliku JSON (nadpisanie)
         with open (f"{self.csv}.json", "w", encoding='utf-8') as f:
             json.dump(teryt_geom, f)
-        # dodatkowo poza jsonem zwrot słownika {"TERYT":"GEOM_WKT"} przez funkcję
+        # dodatkowo zwrotka finalnego wyniku (nie tylko json)
         return teryt_geom
+    
+    
+    ####################################
+    # JSON {"TERYT":"GEOM_WKT"} => BBOX
+    ####################################
+
+    def bbox(self):
+        #utworzenie pustej listy porównawczej, 
+        # do której później wpadać będą pary kompletów (listy) współrzędnych
+        compare_list = []
+        #otworzenie jsona stworzonego przez uldk.json()
+        with open(f"{self.csv}.json") as f:
+            j = json.load(f)
+            # iteracja przez wszystkie pary {"TERYT":"GEOM_WKT"} z jsona
+            for geom in j.values():
+                # wyodrębnienie samych liczb (współrzędnych) z geom (do listy)
+                xy_list = re.findall("\d+\.\d+",geom)
+                # lista samych x-ów (co 2 element od 0)
+                x_list = xy_list[0::2]
+                # lista samych y-ków (co 2 element od 1)
+                y_list = xy_list[1::2]
+                # dodanie ich extremów do utworzonej wcześniej listy porównawczej
+                compare_list.append( [min(x_list), min(y_list), max(x_list), max(y_list)] )
+                # Jeżeli w tej liście znajduje się aktualnie
+                # komplet (para) list współrzędnych do porównania
+                # tworzymy z nich jedną listę z ekstremami 
+                if len(compare_list) == 2:
+                    # pobranie kompletów ekstremów do zmiennych a i b
+                    # a oraz b to listy o strukturze [min x, min y, max x, max y]
+                    a = compare_list[0]
+                    b = compare_list[1]
+                    # najmniejszy x min (pomiędzy a i b)
+                    ab_min_x = min(a[0], b[0])
+                    # najmniejszy y min (pomiędzy a i b)
+                    ab_min_y = min(a[1], b[1])
+                    # największy x max (pomiędzy a i b)
+                    ab_max_x = max(a[2], b[2])
+                    # największy y max (pomiędzy a i b)
+                    ab_max_y = max(a[3], b[3])
+                    # zastąpienie a i b w compare_list 
+                    # na jedną listę zawierającą ekstrema 
+                    # z porównania a i b
+                    compare_list = [[ab_min_x, ab_min_y, ab_max_x, ab_max_y]]
+                    
+                # jeśli compare_list zawiera tylko 1 element pomijamy redukcję a i b 
+                # (bo jest tylko nowe a) i wracamy do początku pętli w celu dodania 
+                # kolejnego b    
+        # finalnie compare_list zawiera jedną zwycięzką listę [0]
+        # z której wyciągniemy wsp bboxa
+        x_min = compare_list[0][0]
+        y_min = compare_list[0][1]
+        x_max = compare_list[0][2]
+        y_max = compare_list[0][3]
+        # usługa wfs potrzebuje stringa z odwróconymi wspołrzędnymi
+        # oddzielonymi przecinkami
+        bbox = f"{y_min},{x_min},{y_max},{x_max}"
+        # zapis bboxa do pliku
+        with open (f"bbox_{self.csv}", 'w', encoding='utf-8') as f:
+            f.write(bbox)
+        return bbox
 
 
-# przykład użycia metody json_teryt_geom()
-# wskazujemy na plik csv z listą terytów działek
+
 csv = 'testowy.csv'
-# tworzymy obiekt uldk dostarczając ścieżkę do csv z terytami
+
 uldk = Uldk(csv)
-# wywołanie metody i zapisanie terytów i geometrii do zmiennej(słownik)
-dane = uldk.json_teryt_geom()
+uldk.json()
+uldk.bbox()
 
 
     
