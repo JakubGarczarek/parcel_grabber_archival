@@ -1,6 +1,6 @@
 import requests, re, json
 
-class Uldk():
+class ULDK():
 
     def __init__(self, csv):
         self.csv = csv
@@ -44,7 +44,8 @@ class Uldk():
         # dodatkowo zwrotka finalnego wyniku (nie tylko json)
         return teryt_geom
     
-    
+
+
     ####################################
     # JSON {"TERYT":"GEOM_WKT"} => BBOX
     ####################################
@@ -103,4 +104,32 @@ class Uldk():
         with open (f"bbox_{self.csv}", 'w', encoding='utf-8') as f:
             f.write(bbox)
         return bbox
-        
+
+  
+    ####################################
+    # CSV + ORGANY.JSON => URL
+    ####################################
+
+    def url(self):
+        # lista do wrzucania wystąpień danego terytu
+        licz_teryty = []
+        with open(self.csv) as csv:
+            for line in csv:
+                # pobrabnie 4 pierwszych cyfr terytu
+                teryt_powiatu = line.strip()[:4]
+                licz_teryty.append(teryt_powiatu)
+        # najczęściej występujący teryt
+        best_teryt = max(licz_teryty, key=licz_teryty.count)
+        # pobranie danych z jsona przygotowanego
+        # jednorazowo przez json_exporter.py
+        with open ('organy.json') as f:
+            d = json.load(f)
+        for param in d.values():
+            # porównanie z 4 pierwszymi cyframi terytu działki
+            if best_teryt == param['teryt'][:4]:
+            # wyciągnięcie urla i obcięcie apostrofów
+                wfs_url = param['url'][1:-1]
+        #zapis url do pliku
+        with open(f"url_{self.csv}", 'w', encoding='utf-8') as f:
+            f.write(wfs_url)
+        return wfs_url
