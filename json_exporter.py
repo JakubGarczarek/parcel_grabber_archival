@@ -1,4 +1,4 @@
-import json
+import json, csv
 
 # dane z powiatów do przerobienia na prawidłowego jsona
 
@@ -64,6 +64,18 @@ for organ, params in sources.items():
         d[p_list[0]] = p_list[1]
     dane[organ] = d
 
+
+# dorzucenie do przygotowanego
+# wcześniej słownika terytu z csv
+for org, param in dane.items():
+    with open ('organ_teryt.csv') as f:
+        csv_reader = csv.reader(f, delimiter=',')
+        for row in csv_reader:
+                if org == row[0]:
+                    print(org,'==>',row[1])
+                    dane[org]['teryt']=row[1]
+
+    
 # export do json        
 with open('organy.json','w', encoding='utf-8') as f:
     json.dump(dane, f)
@@ -73,4 +85,6 @@ with open('organy.json','w', encoding='utf-8') as f:
 
 with open('organy.json','r') as f:
     j = json.load(f)
-    print(j)
+    
+
+
