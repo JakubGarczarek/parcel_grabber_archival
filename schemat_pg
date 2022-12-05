@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2022-12-05T16:57:55.924Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36" version="20.6.0" etag="RCUfHTIzns5x1uAnyBrV" type="github">
+<mxfile host="app.diagrams.net" modified="2022-12-05T17:00:12.694Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36" version="20.6.0" etag="Fi0CULjt5wc6rrVjf247" type="github">
   <diagram id="PsecCZ7Ffu-27Re0suiu" name="Strona-1">
-    <mxGraphModel dx="2426" dy="1295" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1422" dy="759" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -92,6 +92,15 @@
             <mxPoint x="440" y="230" as="sourcePoint" />
             <mxPoint x="590" y="360" as="targetPoint" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="SF1sFhwqwyAserTqCURy-60" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;shadow=0;strokeWidth=2;fontSize=17;fontColor=#737373;" edge="1" parent="1" target="SF1sFhwqwyAserTqCURy-61">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="380" y="320" as="sourcePoint" />
+            <mxPoint x="390" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SF1sFhwqwyAserTqCURy-61" value="transform ?" style="text;strokeColor=none;fillColor=none;html=1;fontSize=24;fontStyle=1;verticalAlign=middle;align=center;fontColor=#737373;" vertex="1" parent="1">
+          <mxGeometry x="260" y="370" width="100" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
